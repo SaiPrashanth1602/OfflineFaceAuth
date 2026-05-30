@@ -1,49 +1,37 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Camera, useCameraDevice} from 'react-native-vision-camera';
+import React, {useEffect} from 'react';
+import {View, Text} from 'react-native';
+
+import {calculateEAR, isBlinking} from './src/ai/blinkDetector';
+import {detectHeadDirection} from './src/ai/headPose';
+import {checkLiveness} from './src/ai/livenessEngine';
 
 export default function App() {
-  const [permission, setPermission] = useState(false);
-  const device = useCameraDevice('front');
-
   useEffect(() => {
-    async function requestPermission() {
-      const status = await Camera.requestCameraPermission();
-      setPermission(status === 'granted');
-    }
+  console.log("TEST SUCCESS");
+}, []);
+  useEffect(() => {
+    const ear = calculateEAR(40, 2, 2);
 
-    requestPermission();
+    console.log('EAR:', ear);
+    console.log('Blink:', isBlinking(ear));
+
+    console.log(
+      'Direction:',
+      detectHeadDirection(260, 200),
+    );
+
+    console.log(
+      'Liveness:',
+      checkLiveness({
+        blinkPassed: true,
+        headTurnPassed: true,
+      }),
+    );
   }, []);
 
-  if (!permission) {
-    return (
-      <View style={styles.center}>
-        <Text>No Camera Permission</Text>
-      </View>
-    );
-  }
-
-  if (device == null) {
-    return (
-      <View style={styles.center}>
-        <Text>Loading Camera...</Text>
-      </View>
-    );
-  }
-
   return (
-    <Camera
-      style={StyleSheet.absoluteFill}
-      device={device}
-      isActive={true}
-    />
+    <View>
+      <Text>Testing Liveness Engine</Text>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
