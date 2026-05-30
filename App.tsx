@@ -1,45 +1,49 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {Camera, useCameraDevice} from 'react-native-vision-camera';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+export default function App() {
+  const [permission, setPermission] = useState(false);
+  const device = useCameraDevice('front');
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    async function requestPermission() {
+      const status = await Camera.requestCameraPermission();
+      setPermission(status === 'granted');
+    }
+
+    requestPermission();
+  }, []);
+
+  if (!permission) {
+    return (
+      <View style={styles.center}>
+        <Text>No Camera Permission</Text>
+      </View>
+    );
+  }
+
+  if (device == null) {
+    return (
+      <View style={styles.center}>
+        <Text>Loading Camera...</Text>
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <Camera
+      style={StyleSheet.absoluteFill}
+      device={device}
+      isActive={true}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  center: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
-
-export default App;
