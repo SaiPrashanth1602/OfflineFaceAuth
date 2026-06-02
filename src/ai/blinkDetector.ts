@@ -16,12 +16,16 @@ export class BlinkDetector {
 
     return false;
   }
+
+  reset() {
+    this.wasClosed = false;
+  }
 }
 
 export function calculateEAR(
   eyeWidth: number,
   eyeHeight: number,
-  eyeDistance: number
+  eyeDistance: number,
 ): number {
   if (eyeWidth <= 0) {
     return 0;
